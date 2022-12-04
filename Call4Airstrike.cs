@@ -1,4 +1,5 @@
 ﻿using GTA;
+using GTA.Math;
 using GTA.Native;
 using iFruitAddon2;
 using System;
@@ -35,11 +36,14 @@ public class Call4Airstrike : Script {
     private void Answer(iFruitContact contact) {
         phone?.Close(2000); // 2 seconds
 
-        var waypoint = World.WaypointPosition;
+        var waypoint_blip = World.WaypointBlip;
 
-        if (waypoint == null) {
+        if (waypoint_blip == null) {
             GTA.UI.Notification.Show("No Airstrike location selected!", false);
         } else {
+            var waypoint = waypoint_blip.Position;
+            waypoint.Z = World.GetGroundHeight((Vector2) waypoint);
+
             if (!bomb_model.IsLoaded) {
                 if (!bomb_model.Request(1000)) {
                     GTA.UI.Notification.Show("ERROR: Timed out loading bomb model!", false);
@@ -54,8 +58,8 @@ public class Call4Airstrike : Script {
                 float angle = (float)(random.NextDouble() * (2 * Math.PI));
                 float distance = (float)(random.NextDouble() * AirstrikeRadius);
 
-                var pos = new GTA.Math.Vector3(waypoint.X + ((float)Math.Cos(angle) * distance),
-                                               waypoint.Y + ((float)Math.Sin(angle) * distance),
+                var pos = new GTA.Math.Vector3(waypoint.X + ((float) Math.Cos(angle) * distance),
+                                               waypoint.Y + ((float) Math.Sin(angle) * distance),
                                                waypoint.Z);
 
                 SpawnBomb(pos);
