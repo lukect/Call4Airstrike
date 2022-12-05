@@ -28,7 +28,7 @@ public class Call4Airstrike : Script {
     }
 
     readonly float AirstrikeRadius = 20;
-    readonly int AirstrikeBombCount = 25;
+    readonly int AirstrikeBombCount = 100;
     readonly float AirstrikeHeight = 100f;
 
     readonly Random random = new Random();
@@ -55,25 +55,40 @@ public class Call4Airstrike : Script {
             waypoint.Z += AirstrikeHeight;
 
             for (int i = 0; i < AirstrikeBombCount; i++) {
-                float angle = (float)(random.NextDouble() * (2 * Math.PI));
-                float distance = (float)(random.NextDouble() * AirstrikeRadius);
-
-                var pos = new GTA.Math.Vector3(waypoint.X + ((float) Math.Cos(angle) * distance),
-                                               waypoint.Y + ((float) Math.Sin(angle) * distance),
-                                               waypoint.Z);
+                var rand_xy = random_vector2d_within_radius(AirstrikeRadius);
+                var pos = new Vector3(waypoint.X + (float) rand_xy.Item1,
+                                      waypoint.Y + (float) rand_xy.Item2,
+                                      waypoint.Z);
 
                 SpawnBomb(pos);
             }
         }
     }
 
-    private void SpawnBomb(GTA.Math.Vector3 pos) {
+    private (double, double) random_vector2d_within_radius(double radius) {
+        var x = random.NextDouble() * radius;
+        var y = random.NextDouble() * Math.Sqrt((radius * radius) - (x * x));
+
+        var a = random.NextDouble();
+        if (a < .25) { // -, -
+            x = -x;
+            y = -y;
+        } else if (a < .50) { // -, +
+            x = -x;
+        } else if (a < .75) { // +, -
+            y = -y;
+        } // else +, +
+
+        return (x, y);
+    }
+
+    private void SpawnBomb(Vector3 pos) {
         var bomb_prop = World.CreateProp(bomb_model, pos, false, false);
         Function.Call(Hash.SET_ENTITY_RECORDS_COLLISIONS, bomb_prop.Handle, true);
         Function.Call(Hash.SET_ENTITY_LOAD_COLLISION_FLAG, bomb_prop.Handle, true);
         Function.Call(Hash.SET_ENTITY_LOD_DIST, bomb_prop.Handle, 10000);
-        bomb_prop.Rotation = GTA.Math.Vector3.RelativeBottom;
-        bomb_prop.Velocity = GTA.Math.Vector3.RelativeBottom * 10;
+        bomb_prop.Rotation = Vector3.RelativeBottom;
+        bomb_prop.Velocity = Vector3.RelativeBottom * 2;
     }
 
 }
