@@ -87,7 +87,7 @@ public class Call4Airstrike : Script {
         Function.Call(Hash.SET_ENTITY_RECORDS_COLLISIONS, bomb_prop.Handle, true);
         Function.Call(Hash.SET_ENTITY_LOAD_COLLISION_FLAG, bomb_prop.Handle, true);
         Function.Call(Hash.SET_ENTITY_LOD_DIST, bomb_prop.Handle, 10000);
-        bomb_prop.Rotation = Vector3.RelativeBottom;
+        bomb_prop.Rotation = new Vector3(90f, 0f, 0f);
         bomb_prop.Velocity = Vector3.RelativeBottom * 2;
     }
 
